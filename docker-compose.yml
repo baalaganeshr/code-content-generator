@@ -31,7 +31,7 @@ services:
       - HF_TOKEN=${HF_TOKEN}
       - HF_MODEL=microsoft/phi-2
       - ENVIRONMENT=production
-      - USE_AI_MODEL=false
+      - USE_AI_MODEL=true
       - DEVICE=cpu
       - QUANTIZATION=4bit
       - TEMPERATURE=0.7
