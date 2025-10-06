@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Frontend - Next.js (TypeScript)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Backend - FastAPI + HuggingFace + LangGraph
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/code_generator
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - HF_TOKEN=${HF_TOKEN}
+      - HF_MODEL=microsoft/phi-2
+      - ENVIRONMENT=production
+      - USE_AI_MODEL=false
+      - DEVICE=cpu
+      - QUANTIZATION=4bit
+      - TEMPERATURE=0.7
+      - MAX_LENGTH=2048
+    depends_on:
+      - mongo
+      - qdrant
+    networks:
+      - app-network
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+
+  # MongoDB - Database
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=code_generator
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Qdrant - Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6335:6333"
+      - "6336:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  qdrant-data:

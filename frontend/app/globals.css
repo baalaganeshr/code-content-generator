@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-gray-100;
+  }
+}
+
+@layer components {
+  .section-card {
+    @apply bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700;
+  }
+  
+  .code-block {
+    @apply bg-gray-900 rounded-md p-4 overflow-x-auto;
+  }
+}
